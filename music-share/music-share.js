@@ -13,6 +13,9 @@ const INFO = {
     }
 }
 
+const CONFIGINFO = {
+    VERSION: [0, 0, 1]
+}
 const PATH = {
     DIR: "./plugins/music-share/",
     INSTALL: "./plugins/AddonsHelper/",
@@ -62,13 +65,13 @@ logger.setConsole(true, 4)
 logger.setFile("./logs/music-share/")
 
 function packMain() {
-    packInit()
     packCheck()
+
 }
 
 
 //检查content是否完整 转换其他格式为ogg格式 列出pack音乐列表
-function packInit() {
+function packCheck() {
     let Jcontent = new JsonConfigFile(PATH.INDEX.MUSIC_CONTENT, [])
     let content = Jcontent.read()
     content = data.parseJson(content)
@@ -99,21 +102,67 @@ function packInit() {
         //当前pack目录的音乐列表
         let musiclist = File.getFileList(packdir + '/index/')
         let converlist = regA_Z(musiclist, jconfig.get("soundPostfix"))[0]
-        if(converlist!=[]){
+
+        //如果有非ogg  并符合筛选标准的音乐
+        if (converlist != []) {
             toOGG(PATH.INDEX.MUSIC_PACK + content[i]["index"] + '/index/', converlist)
             needReload = true
         }
+
+        //比对 当前资源包的音乐列表 与 旧列表
+        let Jchecklist = new JsonConfigFile(packdir + "/index/checklist.json", `{}`)
+        if (File.exists(packdir + "/index/checklist.json")) {
+            Jchecklist.set("_version_", CONFIGINFO.VERSION)
+            Jchecklist.set("list", {})
+        } else if(needReload ==true){
+            //忽略需要更新的包
+        }else{
+            let checklist = Jchecklist.get("list")
+            let nowlist = regA_Z(musiclist, "[ogg]")[0]
+            if (!(checklist.length!=nowlist.length)){
+                for (i in checklist) {
+                    let haslist = false
+                    for (let v = 0; v < nowlist; v++) {
+                        if(checklist==nowlist[v]){
+                            haslist =true
+                            break
+                        }
+                    }
+                    if (haslist = false){
+                        needReload = true
+                    }
+                }
+            }else{
+                needReload =true
+            }
+        }
+
+        //将当前包是否需要更新 写入content
+        if(needReload == true){
+            content[i]["reLoad"] == true
+        }
+
+        content = data.toJson(content,1)
+        Jcontent.write(content)
+        Jcontent.close()
     }
 
 }
 
 
 //检查是否有新歌或者删除旧歌
-function packCheck() {
-    let Jcontent = new JsonConfigFile(PATH.INDEX.MUSIC_CONTENT, [])
-    let content = Jcontent.read()
-    content = data.parseJson(content)
-}
+// function packCheck() {
+//     let Jcontent = new JsonConfigFile(PATH.INDEX.MUSIC_CONTENT, [])
+//     let content = Jcontent.read()
+//     content = data.parseJson(content)
+//     for (let i = 0;i<content.length;i++){
+
+//         //忽略要重载的包
+//         if(content[i]["reLoad"] == true || File.exists()){
+//             continue
+//         }
+//     }
+// }
 
 function radomUUID() {
     let UUID = ""
@@ -165,13 +214,18 @@ function regA_Z(arry, postfix) {
 function toOGG(path, fileArry) {
     let reg = new RegExp("[.][A-z]*$")
     for (let i = 0; i < fileArry.length; i++) {
-        let outname = fileArry[i].replace(reg,".ogg")
-        system.newProcess("./plugins/lib/ffmpeg/ffmpeg.exe -i " + 
-        path + fileArry[i] + "-acodec libvorbis "+path + outname
+        let outname = fileArry[i].replace(reg, ".ogg")
+        system.newProcess("./plugins/lib/ffmpeg/ffmpeg.exe -i " +
+            path + fileArry[i] + "-acodec libvorbis " + path + outname
         )
-        logger.info("已转换：",outname)
+        logger.info("已转换：", outname)
     }
 }
 
 
-mc.newCommand("LFmusic","音乐控制 导入 新建 music-share插件命令",PermType.GameMasters)
+mc.listen("onServerStarted",function(){
+    let LMC =  mc.newCommand("LFmusic", "音乐控制 导入 新建 music-share插件命令", PermType.GameMasters)
+    LMC.setAlias("LMC")
+})
+
+
