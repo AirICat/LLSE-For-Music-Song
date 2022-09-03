@@ -4,6 +4,7 @@
         0,
         1
     ],
+    "reLoadList":[],
     "pack": {
         "test": {
             "name": "test",
