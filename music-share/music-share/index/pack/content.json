@@ -1,0 +1,27 @@
+[
+    {
+        "index": "test",
+        "name": "test",
+        "doc": "music-share的测试音乐",
+        "category": "record",
+        "backMusic":true,
+        "refix": "record.",
+        "sound": {
+            "stream":false
+        },
+        "check": {
+            "version": [
+                0,
+                0,
+                0
+            ],
+            "uuid": {
+                "head": "",
+                "mod": ""
+            },
+            "refixAddIndex":true,
+            "AddLogo": "$baseRE",
+            "reLoad":false
+        }
+    }
+]

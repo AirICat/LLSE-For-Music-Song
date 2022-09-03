@@ -1,0 +1,14 @@
+{
+  "format_version" : "1.14.0",
+  "sound_definitions" : {
+    "lightSM.test": {
+      "category": "serverMusic",
+      "sounds": [
+        {
+          "name": "sounds/music/test",
+          "stream": true
+        }
+      ]
+    }
+   }
+}

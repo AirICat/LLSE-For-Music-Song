@@ -1,0 +1,17 @@
+{
+    "format_version": 2,
+    "header": {
+        "description": "lxl加载器的lightSM的音乐资源包",
+        "name": "lightServerMusic",
+        "uuid": "f3f55c4c-991a-4158-9ae3-5cf7b2848072",
+        "version": [0, 0, 1]
+    },
+    "modules": [
+        {
+            "description": "音乐资源包",
+            "type": "resources",
+            "uuid": "df2767fb-5bc1-41eb-b38d-2293eac94c92",
+            "version": [0, 0, 1]
+        }
+    ]
+}
