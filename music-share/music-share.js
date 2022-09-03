@@ -130,7 +130,7 @@ function packCheck(Jcontent) {
             //忽略需要更新的包
         } else {
             let checklist = Jchecklist.get("list")
-            let nowlist = regA_Z(musiclist, "[ogg]")[0]
+            let nowlist = regA_Z(musiclist, "[ogg]",true)[0]
             if (!(checklist.length != nowlist.length)) {
                 for (i in checklist) {
                     let haslist = false
@@ -230,15 +230,22 @@ function versionAdd(version) {
 }
 
 
-function regA_Z(arry, postfix) {
+function regA_Z(arry, postfix,cutPostfix) {
     let reg = new RegExp("^[A-z][A-z|_]*" + postfix + "$")
     let musiclist = []
     let outlist = []
+    if (cutPostfix == true){
+        cutPostfix = new RegExp("[.][ogg]")
+    }
     for (let i = 0; i < arry.length; i++) {
         if (reg.test(arry) == true) {
-            musiclist[musiclist.length] = arry[i]
+            if(cutPostfix == true){
+                musiclist.push(arry[i].replace(cutPostfix,""))
+            }else {
+                musiclist.push(arry[i])
+            }
         } else {
-            outlist[outlist.length] = arry[i]
+            outlist.push(arry[i])
         }
     }
     return [musiclist, outlist]
